@@ -136,6 +136,25 @@ model.Article = db.define(
   },
   { timeStamp: true }
 );
+// queue table
+
+model.Queue = db.define(
+  "queue",
+  {
+    i_id: {
+      type: DataTypes.CHAR,
+      primaryKey: true,
+    },
+    e_no_queue: {
+      type: DataTypes.CHAR,
+    },
+    e_status: {
+      type: DataTypes.CHAR,
+    },
+  },
+  { timeStamp: true, freezeTableName: true }
+);
+
 // order table
 model.Order = db.define(
   "order",
@@ -156,6 +175,13 @@ model.Order = db.define(
       references: {
         model: model.User,
         key: "i_id",
+      },
+    },
+    i_no_queue: {
+      type: DataTypes.CHAR,
+      references: {
+        model: model.User,
+        key: "e_no_queue",
       },
     },
     i_price: {

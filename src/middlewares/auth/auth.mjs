@@ -27,7 +27,14 @@ export const authCheck = async (req, res, next) => {
         const checkRefresh = verivyJwt(tokenGet.refresh_token, "refresh");
 
         if (checkRefresh.err === true) {
-          return errRes(res, 401, "Sign in Needed");
+          if (data.data !== "jwt expired") {
+            return errRes(res, 401, "Sign in Needed");
+          } else {
+            await modelDb.Auth.destroy({
+              where: { access_token: accessToken },
+            });
+            return errRes(res, 401, "Sign in Needed");
+          }
         } else {
           // generate new access token
           req.user = {
