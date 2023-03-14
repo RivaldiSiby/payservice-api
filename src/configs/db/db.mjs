@@ -180,8 +180,8 @@ model.Order = db.define(
     i_no_queue: {
       type: DataTypes.CHAR,
       references: {
-        model: model.User,
-        key: "e_no_queue",
+        model: model.Queue,
+        key: "i_id",
       },
     },
     i_price: {
@@ -223,6 +223,9 @@ model.Transaction = db.define(
 model.User.belongsTo(model.Role, { foreignKey: "i_role" });
 model.User.belongsTo(model.Wallet, { foreignKey: "i_wallet" });
 model.Transaction.belongsTo(model.User, { foreignKey: "i_user" });
+model.Order.belongsTo(model.User, { foreignKey: "i_user" });
+model.Order.belongsTo(model.Service, { foreignKey: "i_service" });
+model.Order.belongsTo(model.Queue, { foreignKey: "i_no_queue" });
 
 export const modelDb = model;
 const connectDb = async () => {

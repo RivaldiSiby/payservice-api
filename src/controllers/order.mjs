@@ -55,17 +55,16 @@ export const createOrder = async (req, res) => {
     const no_antrian = `GAD-${dateFormat()}/LA-${no}`;
     console.log(no_antrian);
     const payloadAntrian = {
-      i_id: uid(16),
       e_no_queue: no_antrian,
       e_status: "waiting",
     };
-    await modelDb.Queue.create(payloadAntrian);
+    const dataQueue = await modelDb.Queue.create(payloadAntrian);
     const payload = {
       i_id: uid(16),
       i_service: i_service,
       i_user: req.user.id,
       i_price: price,
-      i_no_queue: no_antrian,
+      i_no_queue: dataQueue.i_id,
     };
 
     const idorder = await modelDb.Order.create(payload);
@@ -81,6 +80,81 @@ export const createOrder = async (req, res) => {
     successResHaveData(res, 201, "Order has been created", {
       id: idorder.i_id,
     });
+  } catch (error) {
+    console.log(error);
+    errRes(res, 500, "Have problem on Server");
+  }
+};
+
+export const readAllOrder = async (req, res) => {
+  try {
+    const result = await modelDb.Order.findAll({
+      include: [
+        {
+          model: modelDb.Service,
+          attributes: ["e_name"],
+          as: "service",
+          required: true,
+        },
+        {
+          model: modelDb.User,
+          attributes: ["e_name"],
+          as: "user",
+          required: true,
+        },
+        {
+          model: modelDb.Queue,
+          attributes: ["e_no_queue", "e_status"],
+          as: "queue",
+          required: true,
+        },
+      ],
+    });
+    return successResHaveData(
+      res,
+      200,
+      "Read All Order has been Success",
+      result
+    );
+  } catch (error) {
+    console.log(error);
+    errRes(res, 500, "Have problem on Server");
+  }
+};
+
+export const readUserOrder = async (req, res) => {
+  try {
+    const result = await modelDb.Order.findAll({
+      where: {
+        i_user: req.user.id,
+      },
+      include: [
+        {
+          model: modelDb.Service,
+          attributes: ["e_name"],
+          as: "service",
+          required: true,
+        },
+        {
+          model: modelDb.User,
+          attributes: ["e_name"],
+          as: "user",
+          required: true,
+        },
+        {
+          model: modelDb.Queue,
+          attributes: ["e_no_queue", "e_status"],
+          as: "queue",
+          required: true,
+        },
+      ],
+    });
+    return successResHaveData(
+      res,
+      200,
+      "Read User Order has been Success",
+      result
+    );
   } catch (error) {
     console.log(error);
     errRes(res, 500, "Have problem on Server");
